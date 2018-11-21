@@ -2,18 +2,18 @@ package com.example.demo.domain;
 
 import com.example.demo.domain.support.AbstractEntity;
 import com.example.demo.domain.support.Price;
+import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Data
-@ToString(of={"name","price"})
+@ToString(of = {"name", "price"})
 public class Menu extends AbstractEntity {
 
     @Column(nullable = false)
@@ -27,11 +27,26 @@ public class Menu extends AbstractEntity {
     @OneToMany
     @JoinColumn(name = "menu_id")
     @OrderBy("created_at ASC")
-    private List<Review> reviews;
+    private List<Review> reviews = new ArrayList<Review>();
 
-    Menu(){}
-    Menu(String name, long price){
+    Menu() {
+    }
+
+    @Builder
+    Menu(String name, long price) {
         this.name = name;
         this.price = new Price(price);
+    }
+
+    public Menu writeReview(String writer, String comment) {
+        reviews.add(Review.builder()
+                .writer(writer)
+                .comment(comment)
+                .build());
+        return this;
+    }
+
+    public int countReviews(){
+        return reviews.size();
     }
 }
